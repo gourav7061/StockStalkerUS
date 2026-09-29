@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stock Research</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#f4f4f2;color:#2b2b2b}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; display: flex; background: #f4f4f2">
+
+<!-- Sidebar -->
+<nav style="width: 88px; flex-shrink: 0; box-sizing: border-box; background: #ffffff; border-right: 1px solid #dcdcd8; display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 8px">
+<div style="width: 36px; height: 36px; border: 2px solid #8a8a86; border-radius: 6px; margin-bottom: 20px"></div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0; width: 72px; background: #e6f0e8; border-radius: 10px">
+<div style="width: 24px; height: 24px; border: 2px solid #3a7d4c; border-radius: 6px"></div>
+<span style="font-size: 11px; color: #2f6a3f; font-weight: 600">Home</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0; width: 72px">
+<div style="width: 24px; height: 24px; border: 2px solid #8a8a86; border-radius: 12px"></div>
+<span style="font-size: 11px; color: #5a5a56">Discover</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0; width: 72px">
+<div style="width: 24px; height: 24px; border: 2px solid #8a8a86; border-radius: 6px"></div>
+<span style="font-size: 11px; color: #5a5a56">Watchlist</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0; width: 72px">
+<div style="width: 24px; height: 24px; border: 2px solid #8a8a86; border-radius: 6px"></div>
+<span style="font-size: 11px; color: #5a5a56">Portfolio</span>
+</div>
+<div style="flex-grow: 1"></div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0; width: 72px">
+<div style="width: 24px; height: 24px; border: 2px solid #8a8a86; border-radius: 12px"></div>
+<span style="font-size: 11px; color: #5a5a56">Settings</span>
+</div>
+</nav>
+
+<!-- Main column -->
+<div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; padding: 8px 16px 0 18px; box-sizing: border-box">
+
+<div style="display: flex; align-items: center; gap: 12px; height: 44px">
+<div style="flex-grow: 1; height: 40px; box-sizing: border-box; border: 1px solid #cfcfca; border-radius: 10px; background: #ffffff; display: flex; align-items: center; padding: 0 14px; gap: 10px; color: #8a8a86; font-size: 14px">
+<div style="width: 14px; height: 14px; border: 2px solid #8a8a86; border-radius: 8px"></div>
+Search stocks…
+</div>
+<div style="width: 36px; height: 36px; border: 1px solid #cfcfca; border-radius: 10px; background: #ffffff"></div>
+<div style="width: 36px; height: 36px; border: 1px solid #cfcfca; border-radius: 10px; background: #ffffff"></div>
+</div>
+
+<!-- Stock header -->
+<div style="display: flex; align-items: center; gap: 14px; margin-top: 14px">
+<div style="width: 36px; height: 36px; border-radius: 8px; background: #d4d4cf"></div>
+<span style="font-size: 26px; font-weight: 700">{{company.name}}</span>
+<span style="font-size: 14px; color: #6a6a66">{{company.line}}</span>
+<span style="font-size: 13px; color: #6a6a66; margin-left: 8px">Data: Fiscal.ai · annual · fetched {{asOf}}</span>
+<div style="flex-grow: 1"></div>
+<div style="width: 36px; height: 36px; border: 1px solid #cfcfca; border-radius: 8px; background: #ffffff"></div>
+<div style="width: 36px; height: 36px; border: 1px solid #cfcfca; border-radius: 8px; background: #ffffff"></div>
+<div style="width: 36px; height: 36px; border: 1px solid #cfcfca; border-radius: 8px; background: #ffffff"></div>
+</div>
+
+<!-- Top-level tabs -->
+<div style="display: flex; gap: 8px; margin-top: 16px">
+<button style="height: 40px; padding: 0 22px; border: 0; border-radius: 8px; background: #3a7d4c; color: #ffffff; font-size: 14px; font-weight: 600">Financial</button>
+<button style="height: 40px; padding: 0 22px; border: 1px solid #dcdcd8; border-radius: 8px; background: #ffffff; color: #2b2b2b; font-size: 14px">Technical</button>
+<button style="height: 40px; padding: 0 22px; border: 1px solid #dcdcd8; border-radius: 8px; background: #ffffff; color: #2b2b2b; font-size: 14px">Strategy Builder</button>
+</div>
+
+<!-- Financial sub-tabs -->
+<div style="display: flex; gap: 8px; margin-top: 20px">
+<sc-for list="{{subtabs}}" as="t" hint-placeholder-count="5">
+<button onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button>
+</sc-for>
+</div>
+
+<!-- Table card -->
+<div style="flex-grow: 1; min-height: 0; margin-top: 16px; box-sizing: border-box; background: #ffffff; border: 1px solid #dcdcd8; border-radius: 14px; display: flex; flex-direction: column; overflow: hidden">
+<div style="flex-shrink: 0; display: flex; align-items: center; height: 44px; background: #3a3a40; color: #ffffff; font-size: 12px; font-weight: 600">
+<div style="width: 300px; flex-shrink: 0; padding-left: 16px; font-size: 14px">{{tab.title}} <span style="font-weight: 400; color: #b8b8bd; font-size: 12px">{{tab.unit}}</span></div>
+<sc-for list="{{cols}}" as="c" hint-placeholder-count="10">
+<div style="flex: 1 1 0; min-width: 0; text-align: right; padding-right: 14px; color: #d8d8dc">{{c.label}}</div>
+</sc-for>
+</div>
+<div style="flex-grow: 1; min-height: 0; overflow-y: auto">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="12">
+<div onClick="{{r.toggle}}" style="{{r.rowStyle}}">
+<div style="{{r.labelStyle}}">{{r.label}}</div>
+<sc-for list="{{r.cells}}" as="cell" hint-placeholder-count="10">
+<div style="{{r.cellStyle}}">{{cell.text}}</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="height: 56px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #8a8a86">
+<span>Educational tool, not financial advice. Investments carry risk; always do your own research.</span>
+<span>Data source: Fiscal.ai (free plan)</span>
+</div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+const DATA = /*__DATA__*/null;
+
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { tab: 'income', closed: {} };
+}
+renderVals() {
+const tabs = DATA.tabs;
+const tab = tabs[this.state.tab];
+const subtabs = Object.keys(tabs).map((k) => ({
+label: tabs[k].title,
+pick: () => this.setState({ tab: k }),
+style: k === this.state.tab
+? 'height: 38px; padding: 0 18px; border: 0; border-radius: 8px; background: #3a7d4c; color: #ffffff; font-size: 14px; font-weight: 600'
+: 'height: 38px; padding: 0 18px; border: 1px solid #dcdcd8; border-radius: 8px; background: #ffffff; color: #2b2b2b; font-size: 14px',
+}));
+const rows = [];
+tab.rows.forEach((r) => {
+const key = this.state.tab + ':' + r.gid;
+if (r.kind === 'group') {
+const isOpen = this.state.closed[key] === undefined ? r.open : !this.state.closed[key];
+rows.push({
+label: (isOpen ? '▾  ' : '▸  ') + r.label,
+cells: DATA.cols.map(() => ({ text: '' })),
+toggle: () => this.setState({ closed: { ...this.state.closed, [key]: isOpen } }),
+rowStyle: 'display: flex; align-items: center; height: 40px; background: #f0f0ec; border-bottom: 1px solid #e4e4e0; cursor: pointer',
+labelStyle: 'width: 300px; flex-shrink: 0; padding-left: 16px; font-size: 14px; font-weight: 600',
+cellStyle: 'flex: 1 1 0',
+});
+return;
+}
+if (r.gid !== undefined) {
+const isOpen = this.state.closed[key] === undefined ? tab.rows.find((x) => x.gid === r.gid && x.kind === 'group').open : !this.state.closed[key];
+if (!isOpen) return;
+}
+rows.push({
+label: r.label,
+cells: r.cells.map((t) => ({ text: t })),
+toggle: () => {},
+rowStyle: 'display: flex; align-items: center; height: 36px; border-bottom: 1px solid #efefeb',
+labelStyle: 'width: 300px; flex-shrink: 0; box-sizing: border-box; padding-left: ' + (r.gid !== undefined ? 36 : 16) + 'px; font-size: 13px; font-weight: ' + (r.bold ? 700 : 400),
+cellStyle: 'flex: 1 1 0; min-width: 0; text-align: right; padding-right: 14px; font-size: 13px; font-variant-numeric: tabular-nums; font-weight: ' + (r.bold ? 700 : 400),
+});
+});
+return {
+company: { name: DATA.company.name, line: DATA.company.ticker + ' · ' + DATA.company.exchange + ' · ' + DATA.company.country },
+asOf: DATA.asOf,
+subtabs,
+tab: { title: tab.title, unit: tab.unit },
+cols: DATA.cols.map((l) => ({ label: l })),
+rows,
+};
+}
+}
+</script>
+</body>
+</html>

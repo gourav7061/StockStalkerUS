@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>US Stock Research</title>
+<style>
+:root{--bg:#f4f4f2;--card:#fff;--line:#dcdcd8;--text:#2b2b2b;--muted:#6a6a66;--green:#3a7d4c;--red:#b3402f}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex}
+button{font-family:inherit;cursor:pointer}
+nav{width:88px;flex-shrink:0;background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:20px 0;gap:8px}
+nav .brand{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:18px}nav .bn{font-size:11px;font-weight:800;line-height:1.1;text-align:center;color:#2f6a3f;letter-spacing:.02em}
+nav .item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 0;width:72px;font-size:11px;color:#5a5a56}
+nav .item.on{background:#e6f0e8;border-radius:10px;color:#2f6a3f;font-weight:600}
+main{flex:1;min-width:0;display:flex;flex-direction:column;padding:8px 16px 0 18px}
+.search{position:relative;height:44px;display:flex;align-items:center}
+.search input{width:100%;height:40px;border:1px solid #cfcfca;border-radius:10px;padding:0 14px;font-size:14px;background:#fff}
+.suggest{position:absolute;top:44px;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:10px;z-index:5;max-height:320px;overflow:auto;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.suggest div{padding:9px 14px;font-size:14px;cursor:pointer;display:flex;gap:10px}
+.suggest div:hover,.suggest div.act{background:#f0f0ec}.suggest .t{font-weight:700;width:64px}.suggest .n{color:var(--muted)}
+.suggest .none{color:var(--muted);cursor:default}
+.head{display:flex;align-items:center;gap:14px;margin-top:14px;min-height:40px;flex-wrap:wrap}
+.head .name{font-size:26px;font-weight:700}.head .meta{font-size:14px;color:var(--muted)}
+.head .price{font-size:26px;font-weight:700;margin-left:8px}.head .chg{font-size:20px;font-weight:600}
+.up{color:var(--green)}.down{color:var(--red)}
+.logo{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);object-fit:cover;background:#fff}
+.tabs{display:flex;gap:8px;margin-top:16px}
+.tabs button,.sub button{height:40px;padding:0 22px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font-size:14px}
+.tabs button.on,.sub button.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+.tabs button:disabled{cursor:not-allowed;color:#a0a09a;background:#efefeb;border-style:dashed;opacity:.85}
+.wip{margin-left:8px;font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#8a6d1a;background:#f6ecc9;border-radius:999px;padding:2px 8px}
+.sub{display:flex;gap:8px;margin-top:20px}.sub button{height:38px;padding:0 18px}
+.card{flex:1;min-height:0;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;overflow:hidden}
+.card .empty{margin:auto;color:#8a8a86;text-align:center;padding:20px}
+.thead,.tr{display:flex;align-items:center}
+.thead{flex-shrink:0;height:44px;background:#3a3a40;color:#d8d8dc;font-size:12px;font-weight:600}
+.thead .l{color:#fff;font-size:14px}.thead .l small{font-weight:400;color:#b8b8bd;font-size:12px;margin-left:6px}
+.l{width:300px;flex-shrink:0;padding-left:16px}
+.c{flex:1 1 0;min-width:0;text-align:right;padding-right:14px;font-variant-numeric:tabular-nums}
+.body{flex:1;min-height:0;overflow:auto}
+.tr{height:36px;border-bottom:1px solid #efefeb;font-size:13px}
+.tr .l{padding-left:36px}.tr.flat .l{padding-left:16px}.tr.bold{font-weight:700}
+.tr.grp{height:40px;background:#f0f0ec;border-bottom:1px solid #e4e4e0;cursor:pointer;font-size:14px;font-weight:600}.tr.grp .l{padding-left:16px}
+footer{height:52px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#8a8a86;gap:16px}
+.err{color:var(--red)}
+</style>
+</head>
+<body>
+<nav>
+<div class="brand"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="11" fill="#2f6a3f"/><circle cx="22" cy="22" r="12.5" stroke="#fff" stroke-width="1.8" opacity=".55"/><path d="M22 6.5v6M22 31.5v6M6.5 22h6M31.5 22h6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" opacity=".55"/><path d="M11.5 27.5 18 20.5l4.2 4.2L31 15" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="31" cy="15" r="2.6" fill="#fff"/></svg><div class="bn">STOCK<br>STALKER</div></div>
+<div class="item on"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg>Home</div><div class="item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>Discover</div><div class="item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/></svg>Watchlist</div><div class="item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M8.5 7.5V5.5a1.5 1.5 0 0 1 1.5-1.5h4a1.5 1.5 0 0 1 1.5 1.5v2"/><path d="M3 13h18"/></svg>Portfolio</div>
+<div style="flex:1"></div><div class="item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg>Settings</div>
+</nav>
+<main>
+<div class="search"><input id="q" placeholder="Search US stocks (free-plan companies)…" autocomplete="off"><div id="sug" class="suggest" hidden></div></div>
+<div class="head" id="head"></div>
+<div class="tabs"><button class="on">Financial</button><button disabled title="Work in progress">Technical <span class="wip">Work in progress</span></button><button disabled title="Work in progress">Strategy Builder <span class="wip">Work in progress</span></button></div>
+<div class="sub" id="sub"></div>
+<div class="card" id="card"><div class="empty">Search for a company to load its financials.</div></div>
+<footer><span>Educational tool, not financial advice. Investments carry risk; always do your own research.</span><span>Data source: Fiscal.ai (free plan)</span></footer>
+</main>
+<script>
+const TABS=[['income','Income Statement'],['balance','Balance Sheet'],['cashflow','Cash Flow Statement'],['ratios','Ratios'],['keymetrics','Key Metrics']];
+let companies=[],data=null,tab='income',closed={},act=-1,shown=[];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+fetch('/api/companies').then(r=>r.json()).then(c=>{companies=c;}).catch(()=>{});
+
+const q=$('q'),sug=$('sug');
+function renderSug(){
+  const t=q.value.trim().toLowerCase();
+  if(!t){sug.hidden=true;return;}
+  shown=companies.filter(c=>c.ticker.toLowerCase().startsWith(t)||c.name.toLowerCase().includes(t)).slice(0,8);
+  sug.innerHTML=shown.length?shown.map((c,i)=>`<div data-i="${i}" class="${i===act?'act':''}"><span class="t">${esc(c.ticker)}</span><span>${esc(c.name)}</span><span class="n">${esc(c.exchange)}</span></div>`).join('')
+    :`<div class="none">Not available on the free plan (only ${companies.length} US-listed companies are covered).</div>`;
+  sug.hidden=false;
+}
+q.addEventListener('input',()=>{act=-1;renderSug();});
+q.addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'){act=Math.min(act+1,shown.length-1);renderSug();e.preventDefault();}
+  else if(e.key==='ArrowUp'){act=Math.max(act-1,0);renderSug();e.preventDefault();}
+  else if(e.key==='Enter'){const c=shown[act>=0?act:0];if(c)load(c);}
+  else if(e.key==='Escape'){sug.hidden=true;}
+});
+sug.addEventListener('mousedown',e=>{const d=e.target.closest('[data-i]');if(d)load(shown[+d.dataset.i]);});
+document.addEventListener('click',e=>{if(!e.target.closest('.search'))sug.hidden=true;});
+
+async function load(c){
+  sug.hidden=true;q.value=`${c.ticker} — ${c.name}`;
+  $('head').innerHTML=`<span class="meta">Loading ${esc(c.name)} (first load makes ~8 API calls)…</span>`;
+  $('card').innerHTML='<div class="empty">Loading…</div>';
+  try{
+    const r=await fetch('/api/company/'+encodeURIComponent(c.key));
+    const j=await r.json();
+    if(!r.ok)throw new Error(j.error||r.status);
+    data=j;closed={};render();
+  }catch(err){
+    data=null;$('head').innerHTML='';
+    $('card').innerHTML=`<div class="empty err">Could not load ${esc(c.name)}: ${esc(err.message)}</div>`;
+  }
+}
+function render(){
+  const co=data.company,qt=data.quote;
+  let price='<span class="meta">Price unavailable</span>';
+  if(qt){
+    const up=(qt.change??0)>=0;
+    price=`<span class="price">$${qt.price.toFixed(2)}</span>`+(qt.change!=null?`<span class="chg ${up?'up':'down'}">${up?'+':''}${qt.change.toFixed(2)} (${up?'+':''}${qt.changePct.toFixed(2)}%)</span>`:'')+`<span class="meta">${esc(qt.date)} · latest close</span>`;
+  }
+  $('head').innerHTML=`<img class="logo" src="/api/logo/${encodeURIComponent(co.key)}" alt="" onerror="this.style.display='none'"><span class="name">${esc(co.name)}</span><span class="meta">${esc(co.ticker)} · ${esc(co.exchange)} · ${esc(co.country)}</span>${price}`;
+  $('sub').innerHTML=TABS.map(([k,l])=>`<button data-k="${k}" class="${k===tab?'on':''}">${l}</button>`).join('');
+  const t=data.tabs[tab];
+  const open=r=>{const k=tab+':'+r.gid;return closed[k]===undefined?t.rows.find(x=>x.gid===r.gid&&x.kind==='group').open:!closed[k];};
+  let rows='';
+  for(const r of t.rows){
+    if(r.kind==='group'){rows+=`<div class="tr grp" data-g="${r.gid}"><div class="l">${open(r)?'▾':'▸'}&nbsp; ${esc(r.label)}</div></div>`;continue;}
+    if(r.gid!==undefined&&!open(r))continue;
+    rows+=`<div class="tr ${r.gid===undefined?'flat':''} ${r.bold?'bold':''}"><div class="l">${esc(r.label)}</div>${r.cells.map(x=>`<div class="c">${esc(x)}</div>`).join('')}</div>`;
+  }
+  $('card').innerHTML=`<div class="thead"><div class="l">${esc(t.title)}<small>${esc(t.unit)}</small></div>${data.cols.map(c=>`<div class="c">${esc(c)}</div>`).join('')}</div><div class="body">${rows||'<div class="empty">No data returned for this tab.</div>'}</div>`;
+}
+$('sub').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(b&&data){tab=b.dataset.k;render();}});
+$('card').addEventListener('click',e=>{
+  const g=e.target.closest('[data-g]');if(!g||!data)return;
+  const t=data.tabs[tab],k=tab+':'+g.dataset.g,row=t.rows.find(x=>x.gid===g.dataset.g&&x.kind==='group');
+  const isOpen=closed[k]===undefined?row.open:!closed[k];closed[k]=isOpen;render();
+});
+</script>
+</body>
+</html>
