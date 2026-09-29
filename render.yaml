@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: stock-stalker
+    runtime: python
+    plan: free
+    buildCommand: "echo no build step"
+    startCommand: python tools/app.py
+    envVars:
+      - key: FISCAL_API_KEY
+        sync: false
+      - key: APP_PASSWORD
+        sync: false
+      - key: VISITOR_DAILY_COMPANIES
+        value: "5"

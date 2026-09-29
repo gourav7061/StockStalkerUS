@@ -11,5 +11,10 @@ Data comes from the [Fiscal.ai](https://fiscal.ai) API using the **free plan** (
 
 Only free-plan companies appear in search. Loading a new company uses about 8 of your 250 daily calls; results are cached in `.tmp/`.
 
+## Host it online (Render)
+1. Render dashboard > New > Blueprint > pick this repo (it reads `render.yaml`).
+2. Set `FISCAL_API_KEY` and `APP_PASSWORD` when prompted. Share the URL and password with reviewers.
+3. Each visitor can load 5 new companies per day (`VISITOR_DAILY_COMPANIES`); everyone shares your Fiscal.ai 250 calls/day.
+
 ## Feedback
 Please open an issue with what you tried, what you expected and what happened.

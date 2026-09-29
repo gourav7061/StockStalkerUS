@@ -47,7 +47,7 @@ An uncached company load = 8 calls: income statement, balance sheet, cash flow, 
 Loaded via the local API: Broadcom, Microsoft, JPMorgan, Apple: all five tabs returned rows plus a price. A non-free company (NYSE_XOM) is rejected with 404 without using an API call.
 
 ## Deployment
-GitHub only stores the code; it cannot run this Python server. To run it, use `python tools/app.py` locally, or a host that runs Python (Render, Railway, etc.). A public host exposes the shared free-plan quota (250 calls/day) to every visitor, so add a password or per-visitor cap first. `.env`, `.tmp/` are gitignored and must never be committed.
+GitHub only stores the code; it cannot run this Python server. Hosting uses `render.yaml` (Render free web service, connect the GitHub repo). Required env vars on the host: `FISCAL_API_KEY`, `APP_PASSWORD` (shared password, HTTP Basic auth, any username). Optional: `VISITOR_DAILY_COMPANIES` (default 5 new companies per visitor per day). When `PORT` is set (hosted) the server binds publicly and refuses to start without `APP_PASSWORD`. The local 240-calls/day cap still protects the free quota, but the cache is lost on host restarts (free instances sleep), so expect re-fetching. `.env` and `.tmp/` are gitignored and must never be committed.
 
 ## Open items
 - Visual check of every tab in a browser (only the JSON API was verified so far).
